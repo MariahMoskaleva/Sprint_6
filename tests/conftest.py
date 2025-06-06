@@ -5,7 +5,7 @@ from pages.home_page import HomePage
 from pages.order_page_customer_data import OrderPageCustomerData
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def driver():
     driver = webdriver.Firefox()
     yield driver

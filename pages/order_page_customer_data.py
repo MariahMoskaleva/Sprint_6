@@ -1,36 +1,35 @@
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
+import allure
 from locators.order_page_customer_data_locators import CustomerDataFormLocators
+from pages.base_page import BasePage
 
 
-class OrderPageCustomerData:
-    def __init__(self, driver):
-        self.driver = driver
+class OrderPageCustomerData(BasePage):
 
-    def wait_for_load_order_page_customer_data(self):
-        WebDriverWait(self.driver, 10).until(
-            expected_conditions.visibility_of_element_located(CustomerDataFormLocators.HEADER_FOR_WHOM_SCOOTER))
+    @allure.step("Ожидание загрузки страницы ввода данных клиента")
+    def wait_for_load(self):
+        self.wait_for_element_visibility(CustomerDataFormLocators.HEADER_FOR_WHOM_SCOOTER)
 
+    @allure.step("Ввод имени: {name}")
     def set_name(self, name):
-        self.driver.find_element(*CustomerDataFormLocators.NAME_INPUT_CONTAINER).send_keys(name)
+        self.send_keys(CustomerDataFormLocators.NAME_INPUT_CONTAINER, name)
 
+    @allure.step("Ввод фамилии: {surname}")
     def set_surname(self, surname):
-        self.driver.find_element(*CustomerDataFormLocators.SURNAME_INPUT_CONTAINER).send_keys(surname)
+        self.send_keys(CustomerDataFormLocators.SURNAME_INPUT_CONTAINER, surname)
 
+    @allure.step("Ввод адреса: {address}")
     def set_address(self, address):
-        self.driver.find_element(*CustomerDataFormLocators.ADDRESS_INPUT_CONTAINER).send_keys(address)
+        self.send_keys(CustomerDataFormLocators.ADDRESS_INPUT_CONTAINER, address)
 
-    def select_subway_station(self):
-        self.driver.find_element(*CustomerDataFormLocators.SUBWAY_STATION_SELECT_SEARCH).click()
-        self.driver.find_element(*CustomerDataFormLocators.BOULVAR_ROKOSSOVSKOGO_MENU_ITEM).click()
+    @allure.step("Выбор станции метро")
+    def select_subway_station(self, station_locator):
+        self.click(CustomerDataFormLocators.SUBWAY_STATION_SELECT_SEARCH)
+        self.click(station_locator)
 
-        # Явное ожидание, пока кнопка "Далее" станет доступна (вместо invisibility_of_element)
-        WebDriverWait(self.driver, 10).until(
-            expected_conditions.element_to_be_clickable(CustomerDataFormLocators.FURTHER_BUTTON)
-        )
-
+    @allure.step("Ввод номера телефона: {phone}")
     def set_phone_number(self, phone):
-        self.driver.find_element(*CustomerDataFormLocators.PHONE_INPUT_CONTAINER).send_keys(phone)
+        self.send_keys(CustomerDataFormLocators.PHONE_INPUT_CONTAINER, phone)
 
+    @allure.step("Переход к следующему шагу оформления заказа")
     def go_further(self):
-        self.driver.find_element(*CustomerDataFormLocators.FURTHER_BUTTON).click()
+        self.click(CustomerDataFormLocators.FURTHER_BUTTON)

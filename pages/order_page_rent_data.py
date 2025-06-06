@@ -1,49 +1,48 @@
+import allure
 from selenium.common import ElementClickInterceptedException
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-from locators.order_page_rent_data_locators import RentDataFormLocators, SubmitOrderWindowLocators, OrderPlacedLocators
+from pages.base_page import BasePage
+from locators.order_page_rent_data_locators import (
+    RentDataFormLocators,
+    SubmitOrderWindowLocators,
+    OrderPlacedLocators,
+)
 
 
-class OrderPageRentData:
+class OrderPageRentData(BasePage):
     def __init__(self, driver):
         self.driver = driver
 
+    @allure.step("Ожидание загрузки страницы аренды самоката")
     def wait_for_load_order_page_rent_data(self):
-        WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located(RentDataFormLocators.HEADER_ABOUT_RENT))
+        self.wait_for_element_visibility(RentDataFormLocators.HEADER_ABOUT_RENT)
 
+    @allure.step("Установка даты аренды")
     def set_date(self):
-        self.driver.find_element(*RentDataFormLocators.RENT_DATE_DATE_PICKER).click()
-        self.driver.find_element(*RentDataFormLocators.DATE_PICKER_DAY).click()
+        self.click(RentDataFormLocators.RENT_DATE_DATE_PICKER)
+        self.click(RentDataFormLocators.DATE_PICKER_DAY)
 
+    @allure.step("Выбор срока аренды")
     def set_rent_time(self):
-        self.driver.find_element(*RentDataFormLocators.RENT_TIME_DROPDOWN).click()
-        self.driver.find_element(*RentDataFormLocators.RENT_TIME_SELECTED).click()
+        self.click(RentDataFormLocators.RENT_TIME_DROPDOWN)
+        self.click(RentDataFormLocators.RENT_TIME_SELECTED)
 
+    @allure.step("Выбор цвета самоката")
     def set_scooter_color(self):
-        self.driver.find_element(*RentDataFormLocators.SCOOTER_COLOR_PLACEHOLDER_BLACK).click()
+        self.click(RentDataFormLocators.SCOOTER_COLOR_PLACEHOLDER_BLACK)
 
+    @allure.step("Ввод комментария для курьера: {comment}")
     def set_comment(self, comment):
-        self.driver.find_element(*RentDataFormLocators.COMMENT_INPUT).send_keys(comment)
+        self.send_keys(RentDataFormLocators.COMMENT_INPUT, comment)
 
+    @allure.step("Оформление заказа")
     def place_order(self):
-        order_button = WebDriverWait(self.driver, 10).until(
-            expected_conditions.element_to_be_clickable(RentDataFormLocators.ORDER_BUTTON)
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", order_button)
+        self.scroll_into_view(RentDataFormLocators.ORDER_BUTTON)
         try:
-            order_button.click()
+            self.click(RentDataFormLocators.ORDER_BUTTON)
         except ElementClickInterceptedException:
-            self.driver.execute_script("arguments[0].click();", order_button)
+            self.js_click(RentDataFormLocators.ORDER_BUTTON)
 
-        yes_button = WebDriverWait(self.driver, 10).until(
-            expected_conditions.element_to_be_clickable(SubmitOrderWindowLocators.YES_BUTTON)
-        )
-        yes_button.click()
+        self.click(SubmitOrderWindowLocators.YES_BUTTON)
 
-        WebDriverWait(self.driver, 10).until(
-            expected_conditions.visibility_of_element_located(OrderPlacedLocators.ORDER_PLACED_TEXT)
-        )
-        check_status_button = WebDriverWait(self.driver, 10).until(
-            expected_conditions.element_to_be_clickable(OrderPlacedLocators.CHECK_STATUS_BUTTON)
-        )
-        check_status_button.click()
+        self.wait_for_element_visibility(OrderPlacedLocators.ORDER_PLACED_TEXT)
+        self.click(OrderPlacedLocators.CHECK_STATUS_BUTTON)
